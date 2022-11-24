@@ -1,4 +1,5 @@
-from flask_restful import Resource, reqparse, request
+from flask import Response, request
+from flask_restful import Resource
 from database.db import db
 from database.models import Users
 from bson import json_util, objectid
@@ -20,13 +21,8 @@ class User(Resource):
 
 class UserList(Resource):
     def get(self):
-        collection = db.users
-        users = []
-        cursor = collection.find({})
-        for document in cursor:
-            users.append(document)
-        jsonStr = parse_json(users)
-        return jsonStr
+        users = Users.objects().to_json()
+        return Response(users, mimetype="application/json", status=200)
 
     def post(self):
             # parser = reqparse.RequestParser()
