@@ -1,17 +1,23 @@
 
-from flask import Flask, send_from_directory
+from flask import Flask
 from flask_restful import Api
 from flask_cors import CORS  # comment this on deployment
-from backend.HelloApiHandler import HelloApiHandler
+from flask_jwt_extended import JWTManager
+from database.db import initialize_db
+
+from backend.User import Users, UserList
+from backend.Login import LoginApi
+from backend.errors import errors
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/')
+app.config["MONGO_URI"] = "mongodb://localhost:27017/mamo_db"
 CORS(app)  # comment this on deployment
-api = Api(app)
+api = Api(app, errors=errors)
 
+jwt = JWTManager(app)
 
-# @app.route("/", defaults={'path': ''})
-# def serve(path):
-#     return send_from_directory(app.static_folder, 'index.html')
+api.add_resource(Users, '/users/<user_id>')
+api.add_resource(UserList, '/users')
 
-
-api.add_resource(HelloApiHandler, '/flask/hello')
+api.add_resource(LoginApi, '/login')
+initialize_db(app)
