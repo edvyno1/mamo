@@ -1,16 +1,37 @@
 from flask import Response, request
 from flask_restful import Resource
 from database.models import Users, Role
-from backend.errors import PermissionError
+from errors import PermissionError
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_bcrypt import generate_password_hash
 
 
 class User(Resource):
     def get(self, user_id):
         return Users.objects.get(id=user_id)
 
+    @jwt_required()
     def put(self, user_id):
-        print("lol")
+        admin_id = get_jwt_identity()
+        if not User.isAdmin(self, admin_id):
+            raise PermissionError
+        user = User.get(self, user_id)
+        body = request.get_json()
+        if "password" in body:
+            body["password"] = generate_password_hash(body["password"]).decode('utf8')
+        user.update(**body)
+
+    @jwt_required()
+    def delete(self, user_id):
+        admin_id = get_jwt_identity()
+        if not User.isAdmin(self, admin_id):
+            raise PermissionError  # perhaps reuse this in isAdmin func
+        user = User.get(self, user_id)
+        user.delete()
+
+    def isAdmin(self, user_id):
+        user = User.get(self, user_id)
+        return True if user.role == Role.ADMIN else False
 
 
 class UserList(Resource):
@@ -21,8 +42,7 @@ class UserList(Resource):
     @jwt_required()
     def post(self):
         user_id = get_jwt_identity()
-        user = User.get(self, user_id)
-        if user.role != Role.ADMIN:
+        if not User.isAdmin(self, user_id):
             raise PermissionError
         body = request.get_json()
         users = Users(**body)

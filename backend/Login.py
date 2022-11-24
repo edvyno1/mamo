@@ -2,7 +2,7 @@ from flask import request
 from flask_jwt_extended import create_access_token
 from database.models import Users
 from flask_restful import Resource
-from backend.errors import UnauthorizedError
+from errors import UnauthorizedError
 import datetime
 
 
