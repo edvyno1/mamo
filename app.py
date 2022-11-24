@@ -14,6 +14,7 @@ app.config["MONGO_URI"] = "mongodb://localhost:27017/mamo_db"
 CORS(app)  # comment this on deployment
 api = Api(app, errors=errors)
 
+app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
 jwt = JWTManager(app)
 
 api.add_resource(User, '/users/<user_id>')
