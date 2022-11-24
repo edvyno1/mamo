@@ -2,7 +2,7 @@ from .db import db
 from flask_bcrypt import generate_password_hash, check_password_hash
 
 
-class User(db.Document):
+class Users(db.Document):
     username = db.StringField(required=True, unique=True)
     password = db.StringField(required=True, min_length=6)
     # questions = db.ListField(db.ReferenceField('Question', reverse_delete_rule=db.PULL))

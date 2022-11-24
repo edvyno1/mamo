@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse, request
 from database.db import db
-from database.models import User
+from database.models import Users
 from bson import json_util, objectid
 import json
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -10,7 +10,7 @@ def parse_json(data):
     return json.loads(json_util.dumps(data))
 
 
-class Users(Resource):
+class User(Resource):
     def get(self, user_id):
         return parse_json([i for i in db.users.find({"_id": objectid.ObjectId(user_id)})])
 
@@ -39,9 +39,9 @@ class UserList(Resource):
         # user_id = get_jwt_identity()
         # print(user_id)
         body = request.get_json()
-        user = User(**body)
-        user.hash_password()
-        user.save()
+        users = Users(**body)
+        users.hash_password()
+        users.save()
         print(body)
         # db.users.insert_one(
         #     {

@@ -5,7 +5,7 @@ from flask_cors import CORS  # comment this on deployment
 from flask_jwt_extended import JWTManager
 from database.db import initialize_db
 
-from backend.User import Users, UserList
+from backend.User import User, UserList
 from backend.Login import LoginApi
 from backend.errors import errors
 
@@ -16,7 +16,7 @@ api = Api(app, errors=errors)
 
 jwt = JWTManager(app)
 
-api.add_resource(Users, '/users/<user_id>')
+api.add_resource(User, '/users/<user_id>')
 api.add_resource(UserList, '/users')
 
 api.add_resource(LoginApi, '/login')
