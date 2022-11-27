@@ -1,7 +1,7 @@
 from flask import Response, request
 from flask_restful import Resource
 from database.models import Users, Role
-from errors import PermissionError, UserDoesNotExist, InvalidUserID
+from errors import PermissionError, UserDoesNotExist, InvalidUserID, NotAStudentError, NotATeacherError
 from mongoengine.errors import DoesNotExist, ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_bcrypt import generate_password_hash
@@ -39,6 +39,13 @@ class User(Resource):
             raise PermissionError
         else:
             pass
+
+    def checkIfRole(self, user, role: Role):
+        if user.role != role:
+            if role == Role.TEACHER:
+                raise NotATeacherError
+            if role == Role.STUDENT:
+                raise NotAStudentError
 
 
 class UserList(Resource):

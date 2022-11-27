@@ -42,13 +42,11 @@ class GroupList(Resource):
         body = request.get_json()
         teacher_id = body["teacher"]
         teacher = User.get(self, teacher_id)
-        if not teacher.role == Role.TEACHER:
-            raise NotATeacherError
+        User.checkIfRole(self, teacher, Role.TEACHER)
         student_ids = body["students"]
         for id in student_ids:
             student = User.get(self, id)
-            if not student.role == Role.STUDENT:
-                raise NotAStudentError
+            User.checkIfRole(self, student, Role.STUDENT)
         groups = Groups(**body)
         groups.save()
         return Response(status=200)
