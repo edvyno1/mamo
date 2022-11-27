@@ -5,8 +5,9 @@ from flask_cors import CORS  # comment this on deployment
 from flask_jwt_extended import JWTManager
 from database.db import initialize_db
 
-from User import User, UserList
-from Login import LoginApi
+from user import User, UserList
+from login import LoginApi
+from group import Group, GroupList
 from errors import errors
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/')
@@ -19,6 +20,9 @@ jwt = JWTManager(app)
 
 api.add_resource(User, '/users/<user_id>')
 api.add_resource(UserList, '/users')
+
+api.add_resource(Group, '/groups/<group_id>')
+api.add_resource(GroupList, '/groups')
 
 api.add_resource(LoginApi, '/login')
 initialize_db(app)
