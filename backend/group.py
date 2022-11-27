@@ -17,8 +17,7 @@ class Group(Resource):
     @jwt_required()
     def put(self, group_id):
         admin_id = get_jwt_identity()
-        if not User.isAdmin(self, admin_id):
-            raise PermissionError
+        User.checkIfAdmin(self, admin_id)
         group = User.get(self, group_id)
         body = request.get_json()
         group.update(**body)  # need validation
@@ -26,8 +25,7 @@ class Group(Resource):
     @jwt_required()
     def delete(self, group_id):
         admin_id = get_jwt_identity()
-        if not User.isAdmin(self, admin_id):
-            raise PermissionError  # perhaps reuse this in isAdmin func
+        User.checkIfAdmin(self, admin_id)
         group = Group.get(self, group_id)
         group.delete()
 
@@ -40,8 +38,7 @@ class GroupList(Resource):
     @jwt_required()
     def post(self):
         admin_id = get_jwt_identity()
-        if not User.isAdmin(self, admin_id):
-            raise PermissionError
+        User.checkIfAdmin(self, admin_id)
         body = request.get_json()
         teacher_id = body["teacher"]
         teacher = User.get(self, teacher_id)

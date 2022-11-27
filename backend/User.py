@@ -10,7 +10,7 @@ from flask_bcrypt import generate_password_hash
 class User(Resource):
     def get(self, user_id):
         try:
-            return Users.objects.get(id=user_id).to_json()
+            return Users.objects.get(id=user_id)
         except (DoesNotExist):
             raise UserDoesNotExist
         except (ValidationError):
@@ -19,8 +19,7 @@ class User(Resource):
     @jwt_required()
     def put(self, user_id):
         admin_id = get_jwt_identity()
-        if not User.isAdmin(self, admin_id):
-            raise PermissionError
+        User.checkIfAdmin(self, admin_id)
         user = User.get(self, user_id)
         body = request.get_json()
         if "password" in body:
@@ -30,14 +29,16 @@ class User(Resource):
     @jwt_required()
     def delete(self, user_id):
         admin_id = get_jwt_identity()
-        if not User.isAdmin(self, admin_id):
-            raise PermissionError  # perhaps reuse this in isAdmin func
+        User.checkIfAdmin(self, admin_id)
         user = User.get(self, user_id)
         user.delete()
 
-    def isAdmin(self, user_id):
+    def checkIfAdmin(self, user_id):
         user = User.get(self, user_id)
-        return True if user.role == Role.ADMIN else False
+        if user.role != Role.ADMIN:
+            raise PermissionError
+        else:
+            pass
 
 
 class UserList(Resource):
@@ -48,8 +49,7 @@ class UserList(Resource):
     @jwt_required()
     def post(self):
         admin_id = get_jwt_identity()
-        if not User.isAdmin(self, admin_id):
-            raise PermissionError
+        User.checkIfAdmin(self, admin_id)
         body = request.get_json()
         users = Users(**body)
         users.hash_password()
