@@ -16,9 +16,9 @@ const Login = ({ addToken }) => {
       });
   };
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    const name = e.target.name;
+  const handleChange = (event) => {
+    const value = event.target.value;
+    const name = event.target.name;
 
     setLoginData({
       ...loginData,
