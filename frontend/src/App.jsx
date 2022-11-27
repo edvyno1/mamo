@@ -15,7 +15,6 @@ function App() {
   const [token, setToken] = useState();
 
   const addToken = (access_token) => {
-    console.log(access_token);
     sessionStorage.setItem("access_token", access_token);
     setToken(access_token);
   };
