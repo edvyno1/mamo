@@ -1,6 +1,5 @@
 import './App.css';
-import Layout from './components/Layout';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Login from './routes/Login';
 import Admin from './routes/Admin';
