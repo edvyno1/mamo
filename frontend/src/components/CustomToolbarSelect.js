@@ -1,6 +1,6 @@
 import React from "react";
-import { IconButton, Tooltip } from '@mui/material';
-import { Delete, Edit } from '@mui/icons-material';
+import { IconButton, Tooltip } from "@mui/material";
+import { Delete, Edit } from "@mui/icons-material";
 
 class CustomToolbarSelect extends React.Component {
   handleClick = () => {
@@ -11,13 +11,13 @@ class CustomToolbarSelect extends React.Component {
     return (
       <div className={"custom-toolbar-select"}>
         <Tooltip title={"icon 2"}>
-          <IconButton  onClick={this.handleClick}>
-            <Edit  />
+          <IconButton onClick={this.handleClick}>
+            <Edit />
           </IconButton>
         </Tooltip>
         <Tooltip title={"icon 1"}>
-          <IconButton  onClick={this.handleClick}>
-            <Delete  />
+          <IconButton onClick={this.handleClick}>
+            <Delete />
           </IconButton>
         </Tooltip>
       </div>
