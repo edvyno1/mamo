@@ -1,4 +1,4 @@
-from flask import Response, request
+from flask import Response, request, jsonify
 from flask_restful import Resource
 from database.models import Role, Groups
 from user import User
@@ -9,6 +9,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 class Group(Resource):
     def get(self, group_id):
+        return jsonify(self.getObj(group_id))
+
+    def getObj(self, group_id):
         try:
             return Groups.objects.get(id=group_id)
         except (DoesNotExist):
@@ -17,16 +20,16 @@ class Group(Resource):
     @jwt_required()
     def put(self, group_id):
         admin_id = get_jwt_identity()
-        User.checkIfAdmin(self, admin_id)
-        group = User.get(self, group_id)
+        User.checkIfRole(self, admin_id, Role.ADMIN)
+        group = User.getObj(self, group_id)
         body = request.get_json()
         group.update(**body)  # need validation
 
     @jwt_required()
     def delete(self, group_id):
         admin_id = get_jwt_identity()
-        User.checkIfAdmin(self, admin_id)
-        group = Group.get(self, group_id)
+        User.checkIfRole(self, admin_id, Role.ADMIN)
+        group = Group.getObj(self, group_id)
         group.delete()
 
 
@@ -38,17 +41,13 @@ class GroupList(Resource):
     @jwt_required()
     def post(self):
         admin_id = get_jwt_identity()
-        User.checkIfAdmin(self, admin_id)
+        User.checkIfRole(self, admin_id, Role.ADMIN)
         body = request.get_json()
         teacher_id = body["teacher"]
-        teacher = User.get(self, teacher_id)
-        if not teacher.role == Role.TEACHER:
-            raise NotATeacherError
+        User.checkIfRole(self, teacher_id, Role.TEACHER)
         student_ids = body["students"]
         for id in student_ids:
-            student = User.get(self, id)
-            if not student.role == Role.STUDENT:
-                raise NotAStudentError
+            User.checkIfRole(self, id, Role.STUDENT)
         groups = Groups(**body)
         groups.save()
         return Response(status=200)

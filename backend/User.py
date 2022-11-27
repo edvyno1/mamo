@@ -1,7 +1,7 @@
-from flask import Response, request
+from flask import Response, request, jsonify
 from flask_restful import Resource
 from database.models import Users, Role
-from errors import PermissionError, UserDoesNotExist, InvalidUserID
+from errors import PermissionError, UserDoesNotExist, InvalidUserID, NotAStudentError, NotATeacherError
 from mongoengine.errors import DoesNotExist, ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_bcrypt import generate_password_hash
@@ -9,6 +9,9 @@ from flask_bcrypt import generate_password_hash
 
 class User(Resource):
     def get(self, user_id):
+        return jsonify(self.getObj(user_id))
+
+    def getObj(self, user_id):
         try:
             return Users.objects.get(id=user_id)
         except (DoesNotExist):
@@ -19,8 +22,8 @@ class User(Resource):
     @jwt_required()
     def put(self, user_id):
         admin_id = get_jwt_identity()
-        User.checkIfAdmin(self, admin_id)
-        user = User.get(self, user_id)
+        User.checkIfRole(self, admin_id, Role.ADMIN)
+        user = User.getObj(self, user_id)
         body = request.get_json()
         if "password" in body:
             body["password"] = generate_password_hash(body["password"]).decode('utf8')
@@ -29,16 +32,19 @@ class User(Resource):
     @jwt_required()
     def delete(self, user_id):
         admin_id = get_jwt_identity()
-        User.checkIfAdmin(self, admin_id)
-        user = User.get(self, user_id)
+        User.checkIfRole(self, admin_id, Role.ADMIN)
+        user = User.getObj(self, user_id)
         user.delete()
 
-    def checkIfAdmin(self, user_id):
-        user = User.get(self, user_id)
-        if user.role != Role.ADMIN:
-            raise PermissionError
-        else:
-            pass
+    def checkIfRole(self, user_id, role: Role):
+        user = User.getObj(self, user_id)
+        if user.role != role:
+            if role == Role.TEACHER:
+                raise NotATeacherError
+            if role == Role.STUDENT:
+                raise NotAStudentError
+            if role == Role.ADMIN:
+                raise PermissionError
 
 
 class UserList(Resource):
@@ -49,7 +55,7 @@ class UserList(Resource):
     @jwt_required()
     def post(self):
         admin_id = get_jwt_identity()
-        User.checkIfAdmin(self, admin_id)
+        User.checkIfRole(self, admin_id, Role.ADMIN)
         body = request.get_json()
         users = Users(**body)
         users.hash_password()
