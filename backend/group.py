@@ -50,3 +50,15 @@ class GroupList(Resource):
         groups = Groups(**body)
         groups.save()
         return Response(groups.to_json(), mimetype="application/json", status=200)
+
+
+class GroupByUser(Resource):
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+        user = User.getObj(self, user_id)
+        print(user)
+        print(Groups.objects(students__in=[user]))
+        if user.role == Role.STUDENT:
+            return jsonify(Groups.objects(students__in=[user]))
+        return jsonify(Groups.objects(teacher__in=[user]))

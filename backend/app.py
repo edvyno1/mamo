@@ -7,7 +7,7 @@ from database.db import initialize_db
 
 from user import User, UserList
 from login import LoginApi
-from group import Group, GroupList
+from group import Group, GroupList, GroupByUser
 from errors import errors
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/')
@@ -23,6 +23,7 @@ api.add_resource(UserList, '/users')
 
 api.add_resource(Group, '/groups/<group_id>')
 api.add_resource(GroupList, '/groups')
+api.add_resource(GroupByUser, '/groups/user')
 
 api.add_resource(LoginApi, '/login')
 initialize_db(app)
