@@ -1,6 +1,7 @@
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
+import { Stack } from "@mui/system";
 
 const Login = ({ addToken }) => {
   const [loginData, setLoginData] = useState({ username: "", password: "" });
@@ -28,29 +29,29 @@ const Login = ({ addToken }) => {
 
   return (
     <form>
-      <TextField
-        name="username"
-        margin="dense"
-        type="text"
-        label="Vardas"
-        variant="outlined"
-        value={loginData.username || ""}
-        onChange={handleChange}
-      />
-      <br />
-      <TextField
-        name="password"
-        margin="dense"
-        type="password"
-        label="Slaptažodis"
-        variant="outlined"
-        value={loginData.password || ""}
-        onChange={handleChange}
-      />
-      <br />
-      <Button onClick={handleClick} variant="contained">
-        Prisijungti
-      </Button>
+      <Stack spacing={3}>
+        <TextField
+          name="username"
+          margin="dense"
+          type="text"
+          label="Vardas"
+          variant="outlined"
+          value={loginData.username || ""}
+          onChange={handleChange}
+        />
+        <TextField
+          name="password"
+          margin="dense"
+          type="password"
+          label="Slaptažodis"
+          variant="outlined"
+          value={loginData.password || ""}
+          onChange={handleChange}
+        />
+        <Button onClick={handleClick} variant="contained">
+          Prisijungti
+        </Button>
+      </Stack>
     </form>
   );
 };

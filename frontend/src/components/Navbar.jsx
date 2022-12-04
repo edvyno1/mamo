@@ -1,4 +1,3 @@
-import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -9,6 +8,9 @@ export default function Navbar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
+          <Button color="inherit">Login</Button>
+          <Button color="inherit">Login</Button>
+          <Button color="inherit">Login</Button>
           <Button color="inherit">Login</Button>
         </Toolbar>
       </AppBar>

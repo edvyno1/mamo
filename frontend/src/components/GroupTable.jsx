@@ -1,51 +1,67 @@
+/* eslint-disable no-unused-vars */
 import {
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
 } from "@mui/material";
 import axios from "axios";
 import MUIDataTable from "mui-datatables";
-import { useState } from "react";
-import CustomToolbar from "../components/CustomToolbar";
-import CustomToolbarSelect from "../components/CustomToolbarSelect";
+import { useEffect, useState } from "react";
+import CustomToolbar from "./CustomToolbar";
+import CustomToolbarSelect from "./CustomToolbarSelect";
 
-export default function UserTable({ data, setData }) {
-  const defaultFormState = {
-    firstName: "",
-    lastName: "",
-    role: "student",
-    username: "",
-    password: "",
-  };
-  const [formData, setFormData] = useState(defaultFormState);
+const GroupTable = ({ data }) => {
+  const [formData, setFormData] = useState({
+    subject: "",
+    teacher: "",
+    students: [],
+  });
+
   const [open, setOpen] = useState(false);
+  const [groupData, setGroupData] = useState();
 
-  const clearData = () => {
-    setFormData(defaultFormState);
-  };
-  const openForm = () => {
-    setOpen(true);
-  };
-  const closeForm = () => {
-    setOpen(false);
-    clearData();
-  };
-
-  const handleCreate = () => {
+  useEffect(() => {
     axios
-      .post("http://localhost:5000/users", formData, {
+      .get("http://localhost:5000/groups", {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
         },
       })
       .then((response) => {
-        setData([...data, response.data]);
+        setGroupData(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    closeForm();
+  }, []);
+
+  const openForm = () => {
+    setOpen(true);
+  };
+  const closeForm = () => {
+    setOpen(false);
+  };
+  const parseFormData = () => {
+    const data = { ...formData };
+    data.students = data.students.map((s) => s._id.$oid);
+    data.teacher = data.teacher._id.$oid;
+    return data;
+  };
+
+  const handleCreate = () => {
+    axios
+      .post("http://localhost:5000/groups", parseFormData(), {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+        },
+      })
+      .then((response) => {
+        setGroupData([...groupData, response.data]);
       })
       .catch((error) => {
         console.log(error);
@@ -55,7 +71,6 @@ export default function UserTable({ data, setData }) {
   const handleChange = (event) => {
     const value = event.target.value;
     const name = event.target.name;
-
     setFormData({
       ...formData,
       [name]: value,
@@ -64,26 +79,18 @@ export default function UserTable({ data, setData }) {
 
   const columns = [
     {
-      name: "firstName",
-      label: "Vardas",
+      name: "subject",
+      label: "Dalykas",
       options: {
         filter: false,
         sort: true,
       },
     },
     {
-      name: "lastName",
-      label: "Pavardė",
+      name: "teacher",
+      label: "Mokytojas",
       options: {
         filter: false,
-        sort: true,
-      },
-    },
-    {
-      name: "role",
-      label: "Rolė",
-      options: {
-        filter: true,
         sort: true,
       },
     },
@@ -126,67 +133,54 @@ export default function UserTable({ data, setData }) {
 
   return (
     <>
-      <MUIDataTable title={"Mokiniai"} data={data} columns={columns} options={options} />
+      <MUIDataTable title={"Grupės"} data={[]} columns={columns} options={options} />
       <Dialog open={open} onClose={closeForm}>
         <DialogTitle>Subscribe</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="normal"
-            name="firstName"
-            label="Vardas"
+            name="subject"
+            label="Dalykas"
             type="text"
             fullWidth
             variant="standard"
-            value={formData.firstName || ""}
+            value={formData.subject || ""}
             onChange={handleChange}
           />
-          <TextField
-            autoFocus
-            margin="normal"
-            name="lastName"
-            label="Pavardė"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={formData.lastName || ""}
-            onChange={handleChange}
+          <Autocomplete
+            value={formData.teacher || null}
+            options={data.filter((user) => {
+              return user.role == "teacher";
+            })}
+            getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+            renderInput={(params) => (
+              <TextField {...params} label="filterSelectedOptions" placeholder="Mokiniai" />
+            )}
+            onChange={(e, newValue) => {
+              setFormData({
+                ...formData,
+                ["teacher"]: newValue,
+              });
+            }}
           />
-          <TextField
-            autoFocus
-            margin="normal"
-            name="username"
-            label="Prisijungimo Vardas"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={formData.username || ""}
-            onChange={handleChange}
+          <Autocomplete
+            value={formData.students || null}
+            name="students"
+            multiple
+            options={data}
+            getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+            filterSelectedOptions
+            renderInput={(params) => (
+              <TextField {...params} label="filterSelectedOptions" placeholder="Mokiniai" />
+            )}
+            onChange={(e, newValue) => {
+              setFormData({
+                ...formData,
+                ["students"]: newValue.map((option) => option),
+              });
+            }}
           />
-          <TextField
-            autoFocus
-            margin="normal"
-            name="password"
-            label="Slaptažodis"
-            type="password"
-            fullWidth
-            variant="standard"
-            value={formData.password || ""}
-            onChange={handleChange}
-          />
-          <InputLabel id="role-label">Rolė</InputLabel>
-          <Select
-            labelId="role-label"
-            name="role"
-            value={formData.role}
-            label="Rolė"
-            fullWidth
-            onChange={handleChange}>
-            <MenuItem value={"admin"}>Administratorius</MenuItem>
-            <MenuItem value={"student"}>Mokinys</MenuItem>
-            <MenuItem value={"teacher"}>Mokytojas</MenuItem>
-            <MenuItem value={"parent"}>Mokinio tėvas</MenuItem>
-          </Select>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeForm}>Atšaukti</Button>
@@ -195,4 +189,6 @@ export default function UserTable({ data, setData }) {
       </Dialog>
     </>
   );
-}
+};
+
+export default GroupTable;
