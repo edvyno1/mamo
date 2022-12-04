@@ -9,9 +9,6 @@ export default function Navbar() {
       <AppBar position="static">
         <Toolbar>
           <Button color="inherit">Login</Button>
-          <Button color="inherit">Login</Button>
-          <Button color="inherit">Login</Button>
-          <Button color="inherit">Login</Button>
         </Toolbar>
       </AppBar>
     </Box>
