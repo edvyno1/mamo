@@ -22,6 +22,14 @@ class InvalidUserID(Exception):
     pass
 
 
+class StudentNotFoundInGroup(Exception):
+    pass
+
+
+class TeacherNotFoundInGroup(Exception):
+    pass
+
+
 errors = {
     "UnauthorizedError": {
         "message": "Invalid username or password",
@@ -37,14 +45,22 @@ errors = {
     },
     "NotATeacherError": {
         "message": "Given user is not a teacher",
-        "status": 401
+        "status": 400
     },
     "NotAStudentError": {
         "message": "Given user is not a student",
-        "status": 401
+        "status": 400
     },
     "InvalidUserID": {
         "message": "Given user ID is not valid",
-        "status": 401
+        "status": 400
     },
+    "StudentNotFoundInGroup": {
+        "message": "Student not found when trying to grade",
+        "status": 400
+    },
+    "TeacherNotFoundInGroup": {
+        "message": "Teacher not found in the grading group",
+        "status": 400
+    }
 }
