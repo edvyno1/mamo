@@ -20,8 +20,6 @@ class Users(db.Document):
     role = db.EnumField(Role, required=True)
     firstName = db.StringField(required=True, default="nameless")
     lastName = db.StringField(required=True, default="last nameless")
-    # listfield of grades
-    # listfield of pastabos
 
     def hash_password(self):
         self.password = generate_password_hash(self.password).decode('utf8')
@@ -31,16 +29,17 @@ class Users(db.Document):
 
 
 class Groups(db.Document):
-    #groupName = db.StringField
+    # groupName = db.StringField
     teacher = db.ReferenceField('Users')
     students = db.ListField(db.ReferenceField('Users', reverse_delete_rule=4))
     subject = db.StringField(required=True)
 
-# class Grades():
-    # teacherid
-    # studentid
-    # int grade value
-    # date
+
+class Grades(db.Document):
+    group = db.ReferenceField('Groups')
+    student = db.ReferenceField('Users')
+    value = db.IntField(required=True)
+    date = db.DateTimeField(required=True)
 
 # class Pastabos():
 
