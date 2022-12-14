@@ -61,3 +61,11 @@ class UserList(Resource):
         users.hash_password()
         users.save()
         return Response(users.to_json(), mimetype="application/json", status=200)
+
+
+class CurrentUser(Resource):
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+        user = User.getObj(self, user_id)
+        return Response(user.to_json(), mimetype="application/json", status=200)

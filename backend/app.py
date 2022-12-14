@@ -5,7 +5,7 @@ from flask_cors import CORS  # comment this on deployment
 from flask_jwt_extended import JWTManager
 from database.db import initialize_db
 
-from user import User, UserList
+from user import User, UserList, CurrentUser
 from login import LoginApi
 from group import Group, GroupList, GroupByUser
 from grade import Grade
@@ -21,6 +21,7 @@ jwt = JWTManager(app)
 
 api.add_resource(User, '/users/<user_id>')
 api.add_resource(UserList, '/users')
+api.add_resource(CurrentUser, '/me')
 
 api.add_resource(Group, '/groups/<group_id>')
 api.add_resource(GroupList, '/groups')
