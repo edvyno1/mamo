@@ -31,7 +31,7 @@ class Users(db.Document):
 class Groups(db.Document):
     # groupName = db.StringField
     teacher = db.ReferenceField('Users')
-    students = db.ListField(db.ReferenceField('Users', reverse_delete_rule=4))
+    students = db.ListField(db.DictField(db.ReferenceField('Users')))
     subject = db.StringField(required=True)
 
 

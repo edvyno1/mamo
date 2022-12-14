@@ -1,4 +1,5 @@
 from flask import Response, request, jsonify
+from flask.json import dumps, loads
 from flask_restful import Resource
 from database.models import Role, Groups
 from user import User
@@ -45,8 +46,13 @@ class GroupList(Resource):
         teacher_id = body["teacher"]
         User.checkIfRole(self, teacher_id, Role.TEACHER)
         student_ids = body["students"]
+        students_array = []
         for id in student_ids:
             User.checkIfRole(self, id, Role.STUDENT)
+            student = dumps(User.getObj(self, id))
+            student = loads(student)
+            students_array.append(student)
+        body["students"] = students_array
         groups = Groups(**body)
         groups.save()
         return Response(groups.to_json(), mimetype="application/json", status=200)
