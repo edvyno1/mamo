@@ -21,7 +21,7 @@ const StudentGrades = () => {
         return {
           field: (++i).toString(),
           headerName: i.toString(),
-          editable: true,
+          editable: false,
           minWidth: 36,
           width: 36,
           sortable: false,
