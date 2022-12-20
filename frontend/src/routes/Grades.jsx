@@ -77,11 +77,11 @@ const Grades = () => {
     },
   ];
 
-  const getData = () => {
-    b.map(())
-    // a.map(({  }, index) => (
-    // ));
-  };
+  // const getData = () => {
+  //   b.map(())
+  //   // a.map(({  }, index) => (
+  //   // ));
+  // };
 
   const handleOnCellClick = (params) => {
     openForm();

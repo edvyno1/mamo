@@ -7,11 +7,16 @@ import StudentGrades from "./routes/StudentGrades";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import Note from "./routes/Note";
+import AuthGuard from "./routes/AuthGuard";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Admin />,
+    element: (
+      <AuthGuard requireRole={"admin"}>
+        <Admin />
+      </AuthGuard>
+    ),
   },
   {
     path: "/grades",
