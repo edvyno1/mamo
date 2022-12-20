@@ -9,6 +9,7 @@ from user import User, UserList, CurrentUser
 from login import LoginApi
 from group import Group, GroupList, GroupByUser
 from grade import Grade
+from teacher import TeacherGroupGrades
 from errors import errors
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/')
@@ -22,6 +23,8 @@ jwt = JWTManager(app)
 api.add_resource(User, '/users/<user_id>')
 api.add_resource(UserList, '/users')
 api.add_resource(CurrentUser, '/me')
+
+api.add_resource(TeacherGroupGrades, '/teacher/<group_id>/<date>')
 
 api.add_resource(Group, '/groups/<group_id>')
 api.add_resource(GroupList, '/groups')
