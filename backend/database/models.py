@@ -9,9 +9,10 @@ class Role(Enum):
     STUDENT = 'student'
     PARENT = 'parent'
 
-# class PastabosTipas(Enum):
-#   PAGYRIMAS = 'pagyrimas'
-#   PASTABA = 'pastaba'
+
+class NoteType(Enum):
+    COMMENDATION = 'commendation'
+    REPRIMAND = 'reprimand'
 
 
 class Users(db.Document):
@@ -29,7 +30,6 @@ class Users(db.Document):
 
 
 class Groups(db.Document):
-    # groupName = db.StringField
     teacher = db.ReferenceField('Users')
     students = db.ListField(db.DictField(db.ReferenceField('Users')))
     subject = db.StringField(required=True)
@@ -41,7 +41,16 @@ class Grades(db.Document):
     value = db.IntField(required=True)
     date = db.DateTimeField(required=True)
 
-# class Pastabos():
 
-# class Subject()
-#   
+class Notes(db.Document):
+    group = db.ReferenceField('Groups')
+    student = db.ReferenceField('Users')
+    value = db.StringField(required=True)
+    date = db.DateTimeField(required=True)
+    type = db.EnumField(NoteType, required=True)
+
+
+class Homeworks(db.Document):
+    group = db.ReferenceField('Groups')
+    value = db.StringField(required=True)
+    date_due = db.DateTimeField(required=True)
