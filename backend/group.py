@@ -64,5 +64,12 @@ class GroupByUser(Resource):
         user_id = get_jwt_identity()
         user = User.getObj(self, user_id)
         if user.role == Role.STUDENT:
-            return jsonify(Groups.objects(students__in=[user]))
+            sons = [group.to_mongo() for group in Groups.objects()]
+            dicts = [son.to_dict() for son in sons]
+            id_array = []
+            for group_dict in dicts:
+                for student in group_dict["students"]:
+                    if str(user_id) == str(student["_id"]["$oid"]):
+                        id_array.append(str(group_dict["_id"]))
+            return jsonify(Groups.objects(pk__in=id_array))
         return jsonify(Groups.objects(teacher__in=[user]))
