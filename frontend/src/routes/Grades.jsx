@@ -12,83 +12,78 @@ import { Stack } from "@mui/system";
 import { DataGrid } from "@mui/x-data-grid";
 import { DatePicker } from "@mui/x-date-pickers";
 import axios from "axios";
+import moment from "moment";
 import { useState } from "react";
 import { useEffect } from "react";
 
 const Grades = () => {
   const [groupData, setGroupData] = useState([]);
+  const [formData, setFormData] = useState();
   const [open, setOpen] = useState(false);
-  const [students, setStudents] = useState([]);
+  const [rows, setRows] = useState([]);
+  const [grades, setGrades] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [selectedDate, setSelectedDate] = useState();
 
   const openForm = () => {
     setOpen(true);
   };
   const closeForm = () => {
     setOpen(false);
+    setFormData({});
   };
-
-  const a = [
-    {
-      _id: {
-        $oid: "6399edde4b42f0402ebad6f4",
-      },
-      group: {
-        $oid: "638cbce55ffcf32319ad1f7f",
-      },
-      student: {
-        $oid: "638cbc723cf51b3476fbaf3e",
-      },
-      value: 10,
-      date: {
-        $date: 1545177600000,
-      },
-    },
-    {
-      _id: {
-        $oid: "6399edde4b42f0402ebad6f4",
-      },
-      group: {
-        $oid: "638cbce55ffcf32319ad1f7f",
-      },
-      student: {
-        $oid: "638cbc723cf51b3476fbaf3e",
-      },
-      value: 10,
-      date: {
-        $date: 1545177600000,
-      },
-    },
-  ];
-
-  const b = [
-    {
-      _id: {
-        $oid: "638cbce55ffcf32319ad1f7f",
-      },
-      teacher: {
-        $oid: "638cbc7e3cf51b3476fbaf3f",
-      },
-      students: [
-        {
-          $oid: "638cbc723cf51b3476fbaf3e",
-        },
-      ],
-      subject: "omega maths",
-    },
-  ];
-
-  // const getData = () => {
-  //   b.map(())
-  //   // a.map(({  }, index) => (
-  //   // ));
-  // };
 
   const handleOnCellClick = (params) => {
     openForm();
-    console.log(params);
+    setFormData({
+      ...formData,
+      student: params.id,
+      date: `${selectedDate.toObject().years}-${++selectedDate.toObject().months}-${params.field}`,
+      group: selectedGroup._id.$oid,
+    });
   };
 
-  const handleCellChange = () => {};
+  const handleFormChange = (event) => {
+    const value = event.target.value;
+    const name = event.target.name;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleGradeCreate = () => {
+    axios
+      .post("http://localhost:5000/grades", formData, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+        },
+      })
+      .then(() => {
+        fetchGrades(selectedDate.toObject().years, ++selectedDate.toObject().months);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    closeForm();
+  };
+
+  const fetchGrades = (year, month) => {
+    if (typeof selectedGroup !== "string") {
+      axios
+        .get(`http://localhost:5000/teacher/grades/${selectedGroup._id.$oid}/${year}-${month}`, {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+          },
+        })
+        .then((response) => {
+          setGrades(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
 
   useEffect(() => {
     axios
@@ -104,6 +99,39 @@ const Grades = () => {
         console.log(error);
       });
   }, []);
+
+  useEffect(() => {
+    if (typeof selectedGroup !== "string") {
+      setSelectedDate(moment());
+    }
+  }, [selectedGroup]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      setRows(
+        { ...selectedGroup }.students.map((student) => ({
+          id: student._id.$oid,
+          name: `${student.lastName} ${student.firstName}`,
+        }))
+      );
+      fetchGrades(selectedDate.toObject().years, ++selectedDate.toObject().months);
+    }
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (grades.length > 0) {
+      const changedRows = structuredClone(rows);
+      changedRows.forEach((row) => {
+        [...grades]
+          .filter((grade) => grade.student.$oid == row.id)
+          .forEach((grade) => {
+            row[new Date(grade.date.$date.toString()).getDate().toString()] = grade.value;
+          });
+      });
+
+      setRows(changedRows);
+    }
+  }, [grades]);
 
   const columnNames = () => {
     const columns = [
@@ -132,29 +160,32 @@ const Grades = () => {
     <>
       <Stack spacing={4} style={{ width: "70%" }}>
         <div style={{ display: "flex", gap: "40px" }}>
-          <Select style={{ width: "259px" }}>
-            {groupData.map(({ subject }, index) => (
-              <MenuItem key={index} value={subject}>
-                {subject}
+          <Select
+            style={{ width: "259px" }}
+            onChange={(event) => {
+              setSelectedGroup(event.target.value);
+            }}
+            value={selectedGroup}>
+            {groupData.map((group) => (
+              <MenuItem key={group._id.$oid} value={group}>
+                {group.subject}
               </MenuItem>
             ))}
           </Select>
           <DatePicker
             views={["month"]}
             label="Mėnuo"
-            // value={null}
-            // onChange={(newValue) => {
-            //   setValue(newValue);
-            // }}
+            openTo="month"
+            value={selectedDate}
+            onChange={(newValue) => {
+              setSelectedDate(newValue);
+            }}
             renderInput={(params) => <TextField {...params} helperText={null} />}
           />
         </div>
         <div style={{ height: "500px", width: "100%" }}>
           <DataGrid
-            rows={[
-              { id: 1, name: "Pavardenis Vardenis" },
-              { id: 2, name: "Pavardenis Vardenis" },
-            ]}
+            rows={rows}
             columns={columnNames()}
             disableColumnFilter
             disableColumnMenu
@@ -164,18 +195,25 @@ const Grades = () => {
         </div>
       </Stack>
       <Dialog open={open} onClose={closeForm}>
-        <DialogTitle>Subscribe</DialogTitle>
+        <DialogTitle>Įrašyti pažymį</DialogTitle>
         <DialogContent>
-          <Select labelId="role-label" name="role" value={""} label="Rolė" fullWidth>
-            <MenuItem value={"admin"}>Administratorius</MenuItem>
-            <MenuItem value={"student"}>Mokinys</MenuItem>
-            <MenuItem value={"teacher"}>Mokytojas</MenuItem>
-            <MenuItem value={"parent"}>Mokinio tėvas</MenuItem>
+          <Select
+            labelId="grade-label"
+            name="value"
+            value={formData?.value | ""}
+            label="Pažymys"
+            fullWidth
+            onChange={handleFormChange}>
+            {[...Array(10)].map((_, i) => (
+              <MenuItem key={i} value={(++i).toString()}>
+                {i.toString()}
+              </MenuItem>
+            ))}
           </Select>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeForm}>Atšaukti</Button>
-          <Button onClick={handleCellChange}>Sukurti</Button>
+          <Button onClick={handleGradeCreate}>Sukurti</Button>
         </DialogActions>
       </Dialog>
     </>

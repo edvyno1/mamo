@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import Note from "./routes/Note";
 import AuthGuard from "./routes/AuthGuard";
+import Homework from "./routes/Homework";
 
 const router = createBrowserRouter([
   {
@@ -20,11 +21,27 @@ const router = createBrowserRouter([
   },
   {
     path: "/grades",
-    element: <Grades />,
+    element: (
+      <AuthGuard requireRole={"teacher"}>
+        <Grades />
+      </AuthGuard>
+    ),
   },
   {
     path: "/sg",
-    element: <StudentGrades />,
+    element: (
+      <AuthGuard requireRole={"student"}>
+        <StudentGrades />
+      </AuthGuard>
+    ),
+  },
+  {
+    path: "/sh",
+    element: (
+      <AuthGuard requireRole={"student"}>
+        <Homework />
+      </AuthGuard>
+    ),
   },
   {
     path: "/note",

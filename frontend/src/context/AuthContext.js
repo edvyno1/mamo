@@ -40,7 +40,11 @@ const AuthContextProvider = ({ children }) => {
     setToken(access_token);
   };
 
-  return <AuthContext.Provider value={{ token, role, addToken }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ token, role, addToken, setRole }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export default AuthContextProvider;
