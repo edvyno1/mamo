@@ -194,7 +194,7 @@ const Note = () => {
         </div>
       </Stack>
       <Dialog open={open} onClose={closeForm}>
-        <DialogTitle>Įrašyti pažymį</DialogTitle>
+        <DialogTitle>Sukurti pastabą</DialogTitle>
         <DialogContent>
           <Stack spacing={2}>
             <Select
