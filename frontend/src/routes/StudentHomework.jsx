@@ -29,8 +29,7 @@ const StudentHomework = () => {
       field: "value",
       headerName: "Namų darbas",
       editable: false,
-      width: 200,
-      maxWidth: 200,
+      flex: 1,
       sortable: true,
     },
   ];
@@ -106,6 +105,7 @@ const StudentHomework = () => {
             disableColumnFilter
             disableColumnMenu
             autoHeight
+            getRowHeight={() => "auto"}
           />
         </div>
       </Stack>

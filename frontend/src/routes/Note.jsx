@@ -98,8 +98,7 @@ const Note = () => {
       field: "note",
       headerName: "Tekstas",
       editable: false,
-      width: 200,
-      maxWidth: 200,
+      flex: 1,
       sortable: true,
     },
     {
@@ -190,6 +189,7 @@ const Note = () => {
             disableColumnFilter
             disableColumnMenu
             autoHeight
+            getRowHeight={() => "auto"}
           />
         </div>
       </Stack>
