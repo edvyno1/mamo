@@ -19,6 +19,7 @@
       {
         "code": 100
       }
-    ]
+    ],
+    "no-unused-vars": "warn"
   }
 }

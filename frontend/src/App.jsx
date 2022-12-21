@@ -1,48 +1,66 @@
 import "./App.css";
-import { useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./routes/Login";
 import Admin from "./routes/Admin";
 import Grades from "./routes/Grades";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import StudentGrades from "./routes/StudentGrades";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
+import Note from "./routes/Note";
+import AuthGuard from "./routes/AuthGuard";
+import Homework from "./routes/Homework";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Admin />,
+    element: (
+      <AuthGuard requireRole={"admin"}>
+        <Admin />
+      </AuthGuard>
+    ),
   },
   {
     path: "/grades",
-    element: <Grades />,
+    element: (
+      <AuthGuard requireRole={"teacher"}>
+        <Grades />
+      </AuthGuard>
+    ),
   },
   {
     path: "/sg",
-    element: <StudentGrades />,
+    element: (
+      <AuthGuard requireRole={"student"}>
+        <StudentGrades />
+      </AuthGuard>
+    ),
+  },
+  {
+    path: "/sh",
+    element: (
+      <AuthGuard requireRole={"student"}>
+        <Homework />
+      </AuthGuard>
+    ),
+  },
+  {
+    path: "/note",
+    element: <Note />,
+  },
+  {
+    path: "*",
+    element: <p>Theres nothing here: 404!</p>,
   },
 ]);
 
-function App() {
-  const [token, setToken] = useState();
-  useEffect(() => {
-    setToken(sessionStorage.getItem("access_token"));
-  }, []);
-
-  const addToken = (access_token) => {
-    sessionStorage.setItem("access_token", access_token);
-    setToken(access_token);
-  };
+const App = () => {
+  const { token } = useContext(AuthContext);
 
   if (!token) {
-    return <Login addToken={addToken} />;
+    return <Login />;
   }
 
-  return (
-    <LocalizationProvider dateAdapter={AdapterMoment}>
-      <RouterProvider router={router} />
-    </LocalizationProvider>
-  );
-}
+  return <RouterProvider router={router} />;
+};
 
 export default App;

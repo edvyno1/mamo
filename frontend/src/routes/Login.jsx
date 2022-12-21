@@ -1,10 +1,12 @@
 import { Button, TextField } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
 import { Stack } from "@mui/system";
+import { AuthContext } from "../context/AuthContext";
 
-const Login = ({ addToken }) => {
+const Login = () => {
   const [loginData, setLoginData] = useState({ username: "", password: "" });
+  const { addToken } = useContext(AuthContext);
 
   const handleClick = async () => {
     axios
@@ -29,7 +31,7 @@ const Login = ({ addToken }) => {
 
   return (
     <form>
-      <Stack spacing={3}>
+      <Stack spacing={4}>
         <TextField
           name="username"
           margin="dense"
