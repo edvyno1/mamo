@@ -19,22 +19,38 @@ export default function Navbar() {
       <AppBar position="static">
         <Toolbar>
           {role == "admin" ? (
-            <Button href="/" color="inherit">
+            <Button href="/admin" color="inherit">
               Admin
             </Button>
           ) : null}
           {role == "teacher" ? (
-            <Button href="/grades" color="inherit">
-              Pažymiai
-            </Button>
-          ) : (
-            <Button href="/sg" color="inherit">
-              Pažymiai
-            </Button>
-          )}
-          <Button color="inherit">Pastabos</Button>
-          <Button color="inherit">Namų darbai</Button>
-          <Button onClick={handleLogout} color="inherit">
+            <>
+              <Button href="/teacher/grades" color="inherit">
+                Pažymiai
+              </Button>
+              <Button href="/teacher/homework" color="inherit">
+                Namų Darbai
+              </Button>
+              <Button href="/teacher/notes" color="inherit">
+                Pastabos
+              </Button>
+            </>
+          ) : null}
+          {role == "student" ? (
+            <>
+              <Button href="/student/grades" color="inherit">
+                Pažymiai
+              </Button>
+              <Button href="/student/homework" color="inherit">
+                Namų Darbai
+              </Button>
+              <Button href="/student/notes" color="inherit">
+                Pastabos
+              </Button>
+            </>
+          ) : null}
+
+          <Button href="/" onClick={handleLogout} color="inherit">
             Atsijungti
           </Button>
         </Toolbar>

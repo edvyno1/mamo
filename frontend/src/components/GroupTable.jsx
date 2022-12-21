@@ -20,9 +20,9 @@ const GroupTable = ({ data }) => {
     teacher: "",
     students: [],
   });
-
   const [open, setOpen] = useState(false);
-  const [groupData, setGroupData] = useState();
+  const [groupData, setGroupData] = useState([]);
+  const [rowData, setRowData] = useState([]);
 
   useEffect(() => {
     axios
@@ -39,6 +39,19 @@ const GroupTable = ({ data }) => {
       });
     closeForm();
   }, []);
+
+  useEffect(() => {
+    if (data.length > 0 && groupData.length > 0) {
+      setRowData(
+        groupData.map((group) => ({
+          subject: group.subject,
+          teacher: [data.find((user) => user._id.$oid == group.teacher.$oid)].map(
+            (teacher) => teacher.firstName + " " + teacher.lastName
+          ),
+        }))
+      );
+    }
+  }, [groupData, data]);
 
   const openForm = () => {
     setOpen(true);
@@ -133,9 +146,9 @@ const GroupTable = ({ data }) => {
 
   return (
     <>
-      <MUIDataTable title={"Grupės"} data={[]} columns={columns} options={options} />
-      <Dialog open={open} onClose={closeForm}>
-        <DialogTitle>Subscribe</DialogTitle>
+      <MUIDataTable title={"Grupės"} data={rowData} columns={columns} options={options} />
+      <Dialog minWidth="500" open={open} onClose={closeForm}>
+        <DialogTitle>Grupės kūrimas</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -150,12 +163,10 @@ const GroupTable = ({ data }) => {
           />
           <Autocomplete
             value={formData.teacher || null}
-            options={data.filter((user) => {
-              return user.role == "teacher";
-            })}
+            options={data.filter((user) => user.role == "teacher")}
             getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
             renderInput={(params) => (
-              <TextField {...params} label="filterSelectedOptions" placeholder="Mokiniai" />
+              <TextField {...params} label="Mokytojas" placeholder="Mokytojas" />
             )}
             onChange={(e, newValue) => {
               setFormData({
@@ -168,11 +179,11 @@ const GroupTable = ({ data }) => {
             value={formData.students || null}
             name="students"
             multiple
-            options={data}
+            options={data.filter((user) => user.role == "student")}
             getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
             filterSelectedOptions
             renderInput={(params) => (
-              <TextField {...params} label="filterSelectedOptions" placeholder="Mokiniai" />
+              <TextField {...params} label="Mokiniai" placeholder="Mokiniai" />
             )}
             onChange={(e, newValue) => {
               setFormData({

@@ -126,9 +126,9 @@ export default function UserTable({ data, setData }) {
 
   return (
     <>
-      <MUIDataTable title={"Mokiniai"} data={data} columns={columns} options={options} />
+      <MUIDataTable title={"Naudotojai"} data={data} columns={columns} options={options} />
       <Dialog open={open} onClose={closeForm}>
-        <DialogTitle>Subscribe</DialogTitle>
+        <DialogTitle>Sukurti naudotoją</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus

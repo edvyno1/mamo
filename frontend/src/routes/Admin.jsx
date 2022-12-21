@@ -22,9 +22,9 @@ export default function Admin() {
   }, []);
 
   return (
-    <>
+    <div style={{ display: "flex", gap: "40px" }}>
       <UserTable data={userData} setData={setUserData} />
       <GroupTable data={userData} />
-    </>
+    </div>
   );
 }

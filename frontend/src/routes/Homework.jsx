@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 const Homework = () => {
   const [groupData, setGroupData] = useState([]);
   const [rows, setRows] = useState([]);
-  const [notesData, setNotesData] = useState([]);
+  const [homeworkData, setHomeworkData] = useState([]);
   const [formData, setFormData] = useState();
   const [open, setOpen] = useState(false);
 
@@ -30,17 +30,14 @@ const Homework = () => {
     setFormData({});
   };
 
-  const handleNoteCreate = () => {
-    console.log(formData);
+  const handleHomeworkCreate = () => {
     axios
       .post(
-        "http://localhost:5000/notes",
+        "http://localhost:5000/homeworks",
         {
           group: formData.group,
-          student: formData.student,
           value: formData.value,
-          type: formData.type,
-          date: `${formData.date.toObject().years}-${++formData.date.toObject().months}-${
+          date_due: `${formData.date.toObject().years}-${++formData.date.toObject().months}-${
             formData.date.toObject().date
           }`,
         },
@@ -51,7 +48,7 @@ const Homework = () => {
         }
       )
       .then(() => {
-        fetchNotes();
+        fetchHomework();
       })
       .catch((error) => {
         console.log(error);
@@ -78,32 +75,16 @@ const Homework = () => {
       sortable: true,
     },
     {
-      field: "student",
-      headerName: "Mokinys",
+      field: "dateDue",
+      headerName: "Atlikti iki",
       editable: false,
       width: 200,
       maxWidth: 200,
       sortable: true,
     },
     {
-      field: "date",
-      headerName: "Data",
-      editable: false,
-      width: 200,
-      maxWidth: 200,
-      sortable: true,
-    },
-    {
-      field: "note",
-      headerName: "Tekstas",
-      editable: false,
-      width: 200,
-      maxWidth: 200,
-      sortable: true,
-    },
-    {
-      field: "type",
-      headerName: "Pastaba/Pagyrimas",
+      field: "value",
+      headerName: "Namų darbas",
       editable: false,
       width: 200,
       maxWidth: 200,
@@ -111,15 +92,15 @@ const Homework = () => {
     },
   ];
 
-  const fetchNotes = () => {
+  const fetchHomework = () => {
     axios
-      .get(`http://localhost:5000/teacher/notes`, {
+      .get(`http://localhost:5000/teacher/homeworks`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
         },
       })
       .then((response) => {
-        setNotesData(response.data);
+        setHomeworkData(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -143,28 +124,22 @@ const Homework = () => {
 
   useEffect(() => {
     if (groupData && groupData.length > 0) {
-      fetchNotes();
+      fetchHomework();
     }
   }, [groupData]);
 
   useEffect(() => {
-    if (notesData && notesData.length > 0) {
+    if (homeworkData && homeworkData.length > 0) {
       setRows(
-        [...notesData].map((note) => ({
-          subject: groupData.find((group) => group._id.$oid == note.group.$oid).subject,
-          student: [
-            groupData
-              .find((group) => group._id.$oid == note.group.$oid)
-              .students.find((student) => student._id.$oid == note.student.$oid),
-          ].map(({ firstName, lastName }) => firstName + " " + lastName),
-          id: note._id.$oid,
-          date: note.date.$date,
-          note: note.value,
-          type: note.type,
+        [...homeworkData].map((homework) => ({
+          subject: groupData.find((group) => group._id.$oid == homework.group.$oid).subject,
+          id: homework._id.$oid,
+          dateDue: homework.date_due.$date.substring(0, 10),
+          value: homework.value,
         }))
       );
     }
-  }, [notesData]);
+  }, [homeworkData]);
 
   return (
     <>
@@ -181,7 +156,7 @@ const Homework = () => {
             renderInput={(params) => <TextField {...params} helperText={null} />}
           />
         </div> */}
-        <Button onClick={openForm}>Nauja Pastaba</Button>
+        <Button onClick={openForm}>Naujas namų darbas</Button>
         <div style={{ height: "500px", width: "100%" }}>
           <DataGrid
             rows={rows}
@@ -193,19 +168,9 @@ const Homework = () => {
         </div>
       </Stack>
       <Dialog open={open} onClose={closeForm}>
-        <DialogTitle>Įrašyti pažymį</DialogTitle>
+        <DialogTitle>Įrašyti namų darbą</DialogTitle>
         <DialogContent>
           <Stack spacing={2}>
-            <Select
-              labelId="type-label"
-              name="type"
-              value={formData?.type || ""}
-              label="Tipas"
-              fullWidth
-              onChange={handleFormChange}>
-              <MenuItem value={"reprimand"}>Pastaba</MenuItem>
-              <MenuItem value={"commendation"}>Pagyrimas</MenuItem>
-            </Select>
             <Select
               style={{ width: "259px" }}
               onChange={handleFormChange}
@@ -217,19 +182,6 @@ const Homework = () => {
                 </MenuItem>
               ))}
             </Select>
-            <Select
-              style={{ width: "259px" }}
-              onChange={handleFormChange}
-              name="student"
-              value={formData?.student || ""}>
-              {groupData.map((group) =>
-                group.students.map((student) => (
-                  <MenuItem key={student._id.$oid} value={student._id.$oid}>
-                    {student.firstName + " " + student.lastName}
-                  </MenuItem>
-                ))
-              )}
-            </Select>
             <TextareaAutosize
               style={{ height: "120px" }}
               autoFocus
@@ -237,7 +189,6 @@ const Homework = () => {
               name="value"
               label="Tekstas"
               type="text"
-              fullWidth
               variant="standard"
               value={formData?.value || ""}
               onChange={handleFormChange}
@@ -259,7 +210,7 @@ const Homework = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeForm}>Atšaukti</Button>
-          <Button onClick={handleNoteCreate}>Sukurti</Button>
+          <Button onClick={handleHomeworkCreate}>Sukurti</Button>
         </DialogActions>
       </Dialog>
     </>

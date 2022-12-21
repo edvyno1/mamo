@@ -10,56 +10,83 @@ import Note from "./routes/Note";
 import AuthGuard from "./routes/AuthGuard";
 import Homework from "./routes/Homework";
 import StudentNote from "./routes/StudentNote";
+import StudentHomework from "./routes/StudentHomework";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <p>Sveiki prisijungę</p>,
+  },
+
+  {
+    path: "/admin",
     element: (
       <AuthGuard requireRole={"admin"}>
         <Admin />
       </AuthGuard>
     ),
   },
+
   {
-    path: "/grades",
-    element: (
-      <AuthGuard requireRole={"teacher"}>
-        <Grades />
-      </AuthGuard>
-    ),
+    path: "/student/",
+    children: [
+      {
+        path: "grades",
+        element: (
+          <AuthGuard requireRole={"student"}>
+            <StudentGrades />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "homework",
+        element: (
+          <AuthGuard requireRole={"student"}>
+            <StudentHomework />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "notes",
+        element: (
+          <AuthGuard requireRole={"student"}>
+            <StudentNote />
+          </AuthGuard>
+        ),
+      },
+    ],
   },
+
   {
-    path: "/sg",
-    element: (
-      <AuthGuard requireRole={"student"}>
-        <StudentGrades />
-      </AuthGuard>
-    ),
+    path: "/teacher/",
+    children: [
+      {
+        path: "grades",
+        element: (
+          <AuthGuard requireRole={"teacher"}>
+            <Grades />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "notes",
+        element: (
+          <AuthGuard requireRole={"teacher"}>
+            <Note />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: "homework",
+        element: (
+          <AuthGuard requireRole={"teacher"}>
+            <Homework />
+          </AuthGuard>
+        ),
+      },
+    ],
   },
-  {
-    path: "/sh",
-    element: (
-      <AuthGuard requireRole={"student"}>
-        <Homework />
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/sn",
-    element: (
-      <AuthGuard requireRole={"student"}>
-        <StudentNote />
-      </AuthGuard>
-    ),
-  },
-  {
-    path: "/note",
-    element: <Note />,
-  },
-  {
-    path: "/homework",
-    element: <Note />,
-  },
+
   {
     path: "*",
     element: <p>Theres nothing here: 404!</p>,
