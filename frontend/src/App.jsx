@@ -9,6 +9,7 @@ import { AuthContext } from "./context/AuthContext";
 import Note from "./routes/Note";
 import AuthGuard from "./routes/AuthGuard";
 import Homework from "./routes/Homework";
+import StudentNote from "./routes/StudentNote";
 
 const router = createBrowserRouter([
   {
@@ -44,7 +45,19 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/sn",
+    element: (
+      <AuthGuard requireRole={"student"}>
+        <StudentNote />
+      </AuthGuard>
+    ),
+  },
+  {
     path: "/note",
+    element: <Note />,
+  },
+  {
+    path: "/homework",
     element: <Note />,
   },
   {

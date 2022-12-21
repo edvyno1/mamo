@@ -13,10 +13,9 @@ import { Stack } from "@mui/system";
 import { DataGrid } from "@mui/x-data-grid";
 import { DatePicker } from "@mui/x-date-pickers";
 import axios from "axios";
-import moment from "moment";
 import { useEffect, useState } from "react";
 
-const Note = () => {
+const Homework = () => {
   const [groupData, setGroupData] = useState([]);
   const [rows, setRows] = useState([]);
   const [notesData, setNotesData] = useState([]);
@@ -267,4 +266,4 @@ const Note = () => {
   );
 };
 
-export default Note;
+export default Homework;
